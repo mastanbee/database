@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="41498c3d-b65c-4d96-bc88-6ba2fb595768" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="1445d10e-f85c-43c7-8bf2-95a644b0a630" >
+		<db:my-sql-connection host="iltdb.learn.mulesoft.com" port="3306" user="mule" password="mule" database="training" />
+	</db:config>
+	<flow name="databaseFlow" doc:id="abe73958-d28a-4b5f-95e6-b9d82bb03c5a" >
+		<http:listener doc:name="Listener" doc:id="43687f67-c6eb-4c0a-add1-f484faff4538" config-ref="HTTP_Listener_config" path="/db"/>
+		<logger level="INFO" doc:name="Logger" doc:id="c7c285f9-88f5-4f44-96d1-64d6910014b0" message="flow started"/>
+		<db:select doc:name="Select" doc:id="8df95475-9c32-4a97-a3ef-7c2da4564c9d" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from accounts]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="b1bd7b31-4e08-4348-8b0d-7d3ea1244ceb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="a78b99de-f757-448b-a7c4-59e58fbab75e" message="flow ended"/>
+	</flow>
+</mule>
